@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,13 +9,9 @@
     tools:context="com.weather.frank.sunshine.MainActivityFragment"
     tools:showIn="@layout/activity_main">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:id="@+id/textView2" />
 
-    <TextView
+
+    <!-- <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
@@ -69,6 +65,11 @@
         android:layout_above="@+id/textView3"
         android:layout_toRightOf="@+id/textView5"
         android:layout_toEndOf="@+id/textView5"
-        android:src="@android:drawable/ic_media_play"/>
+        android:src="@android:drawable/ic_media_play"/> -->
 
-</RelativeLayout>
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/listview_forecast"
+        android:layout_gravity="center_horizontal|top" />
+</FrameLayout>
