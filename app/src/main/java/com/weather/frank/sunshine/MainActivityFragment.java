@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +24,7 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         //create fake data in the list
         String[] forecastArray = {
@@ -35,7 +39,25 @@ public class MainActivityFragment extends Fragment {
         List<String> weekForecast = new ArrayList<String>(
                 Arrays.asList(forecastArray)
         );
+        //construct the adapter with proper parameters you want to populate
+        ArrayAdapter<String> mForecastAdapter = new  ArrayAdapter<String>(
 
-        return inflater.inflate(R.layout.fragment_main, container, false);
+                //get the current content (the parent of the current activity)
+                getActivity(),
+
+                //the layout list_item_forecast
+                R.layout.list_item_forecast,
+
+                //the id of the textview to populate
+                R.id.list_item_forecast_textview,
+
+                //the data to fill in
+                weekForecast       );
+
+        //to set the adapter for the listView
+        ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        listView.setAdapter(mForecastAdapter);
+
+        return rootView;
     }
 }
