@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.sql.DriverManager.println;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -59,14 +61,14 @@ public class ForecastFragment extends Fragment {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
             ForecastFragment.FetchWeatherTask refreshWeather = new ForecastFragment.FetchWeatherTask();
-            refreshWeather.execute();
+            refreshWeather.execute("1809858");
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-
+    private ArrayAdapter<String> mForecastAdapter;
 
 
 
@@ -89,7 +91,7 @@ public class ForecastFragment extends Fragment {
                 Arrays.asList(forecastArray)
         );
         //construct the adapter with proper parameters you want to populate
-        ArrayAdapter<String> mForecastAdapter = new  ArrayAdapter<String>(
+        mForecastAdapter = new  ArrayAdapter<String>(
 
                 //get the current content (the parent of the current activity)
                 getActivity(),
@@ -213,9 +215,9 @@ public class ForecastFragment extends Fragment {
                 resultStrs[i] = day + " - " + description + " - " + highAndLow;
             }
 
-            for (String s : resultStrs) {
+            /*for (String s : resultStrs) {
                 Log.v(LOG_TAG, "Forecast entry: " + s);
-            }
+            }*/
 
             return resultStrs;
         }
@@ -277,7 +279,8 @@ public class ForecastFragment extends Fragment {
 
                 forecastJsonStr = buffer.toString();
             } catch (IOException e) {
-                Log.e(LOG_TAG, "Error", e);
+                //Log.e(LOG_TAG, "Error", e);
+
                 return null;
             } finally {
                 if (urlConnection != null) {
@@ -287,7 +290,7 @@ public class ForecastFragment extends Fragment {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error Closing Stream", e);
+                        //Log.e(LOG_TAG, "Error Closing Stream", e);
                     }
                 }
             }
@@ -296,7 +299,7 @@ public class ForecastFragment extends Fragment {
             try {
                 return getWeatherDataFromJson(forecastJsonStr, numDays);
             } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
+                //Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
 
             }
@@ -304,7 +307,15 @@ public class ForecastFragment extends Fragment {
             return null;
         }
 
-
+        @Override
+        protected void onPostExecute(String[] result) {
+            if (result != null){
+                mForecastAdapter.clear();
+                for (String dayForecastStr : result){
+                    mForecastAdapter.add(dayForecastStr);
+                }
+            }
+        }
     }
 }
 
