@@ -2,9 +2,11 @@ package com.weather.frank.sunshine;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.text.format.Time;
 import android.widget.Toast;
+import android.preference.PreferenceActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,7 +68,9 @@ public class ForecastFragment extends Fragment {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
             ForecastFragment.FetchWeatherTask refreshWeather = new ForecastFragment.FetchWeatherTask();
-            refreshWeather.execute("1809858");
+            SharedPreferences mSharedPreference = PreferenceManager.getDefaultSharedPreferences(getContext());
+            String cityId = mSharedPreference.getString(getString(R.string.pref_general_location_key), getString(R.string.pref_general_location_default));
+            refreshWeather.execute(cityId);
             return true;
         }
 
