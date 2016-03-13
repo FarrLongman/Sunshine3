@@ -9,5 +9,22 @@
     tools:context="com.weather.frank.sunshine.DetailsActivityFragment"
     tools:showIn="@layout/activity_details">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/details_text"
+        android:text="@string/app_name"
+        android:elegantTextHeight="false"
+        android:editable="false"
+        android:clickable="false"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentTop="false"
+        android:layout_alignWithParentIfMissing="false"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentRight="false"
+        android:gravity="center"
+        android:textColor="#000000"
+        android:textSize="20dp"/>
+
 
 </RelativeLayout>
