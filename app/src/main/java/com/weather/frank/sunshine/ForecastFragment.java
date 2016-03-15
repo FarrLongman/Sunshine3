@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,7 +19,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.text.format.Time;
 import android.widget.Toast;
-import android.preference.PreferenceActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,14 +28,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static java.sql.DriverManager.println;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -56,6 +53,20 @@ public class ForecastFragment extends Fragment {
         inflater.inflate(R.menu.forecastfragment, menu);
     }
 
+    private void updateWeather() {
+        ForecastFragment.FetchWeatherTask refreshWeather = new ForecastFragment.FetchWeatherTask();
+        SharedPreferences mSharedPreference = PreferenceManager.getDefaultSharedPreferences(getContext());
+        String cityId = mSharedPreference.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
+        String units = mSharedPreference.getString(getString(R.string.pref_TemperatureUnits_key), getString(R.string.pref_TemperatureUnits_default));
+        String[] input = {cityId,units};
+        refreshWeather.execute(input);
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        updateWeather();
+    }
 
 
     @Override
@@ -67,15 +78,13 @@ public class ForecastFragment extends Fragment {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
-            ForecastFragment.FetchWeatherTask refreshWeather = new ForecastFragment.FetchWeatherTask();
-            SharedPreferences mSharedPreference = PreferenceManager.getDefaultSharedPreferences(getContext());
-            String cityId = mSharedPreference.getString(getString(R.string.pref_general_location_key), getString(R.string.pref_general_location_default));
-            refreshWeather.execute(cityId);
+            updateWeather();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
 
     private ArrayAdapter<String> mForecastAdapter;
 
@@ -88,13 +97,13 @@ public class ForecastFragment extends Fragment {
 
         //create fake data in the list
         String[] forecastArray = {
-                "Today - Sunny - 88/63",
+                /*"Today - Sunny - 88/63",
                 "Tomorrow - Foggy - 70/40",
                 "Weds - Cloudy - 72/63",
                 "Thurs - Asteroids - 65/56",
                 "Fri - Heavy Rain - 65/56",
                 "Sat - HELP TRAPPED IN WEATHER STATION - 60/51",
-                "Sun - Sunny - 80/68"
+                "Sun - Sunny - 80/68"*/
         };
         List<String> weekForecast = new ArrayList<String>(
                 Arrays.asList(forecastArray)
@@ -145,7 +154,7 @@ public class ForecastFragment extends Fragment {
 
 
 
-    public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
+    public class FetchWeatherTask extends AsyncTask<String[], Void, String[]> {
         public FetchWeatherTask(){
 
         }
@@ -170,7 +179,7 @@ public class ForecastFragment extends Fragment {
             long roundedHigh = Math.round(high);
             long roundedLow = Math.round(low);
 
-            String highLowStr = roundedHigh + "/" + roundedLow;
+            String highLowStr = roundedLow + "~" + roundedHigh ;
             return highLowStr;
         }
 
@@ -256,7 +265,7 @@ public class ForecastFragment extends Fragment {
 
 
         @Override
-        protected String[] doInBackground(String... params) {
+        protected String[] doInBackground(String[]... params) {
             //set the connection and reader and input to be downloaded to be null to kick start
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
@@ -278,9 +287,9 @@ public class ForecastFragment extends Fragment {
                 final String APPID_PARAM = "APPID";
 
                 Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                        .appendQueryParameter(ID_PARAM, params[0])
+                        .appendQueryParameter(ID_PARAM, params[0][0])
                         .appendQueryParameter(FORMAT_PARAM, format)
-                        .appendQueryParameter(UNITS_PARAM, units)
+                        .appendQueryParameter(UNITS_PARAM, params[0][1])
                         .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
                         .appendQueryParameter(APPID_PARAM, APPID)
                         .build();

@@ -5,18 +5,28 @@
     >
 
     <EditTextPreference
-        android:title="@string/pref_general_location_title"
-        android:key="@string/pref_general_location_key"
-        android:defaultValue="@string/pref_general_location_default"
+        android:title="@string/pref_location_title"
+        android:key="@string/pref_location_key"
+        android:defaultValue="@string/pref_location_default"
         android:inputType="text"
         android:singleLine="true"
-        android:summary="@string/pref_general_location_summary"
+
         >
 
     </EditTextPreference>
 
+    <ListPreference
+        android:title="@string/pref_TemperatureUnits_title"
+        android:key="@string/pref_TemperatureUnits_key"
+        android:defaultValue="@string/pref_TemperatureUnits_default"
+        android:entries="@array/pref_TemperatureUnits_entries"
+        android:entryValues="@array/pref_TemperatureUnits_entries">
 
 
+
+
+
+    </ListPreference>
 
 
 </PreferenceScreen>

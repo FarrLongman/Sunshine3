@@ -5,9 +5,23 @@
     <string name="title_activity_details">DetailsActivity</string>
     <string name="title_activity_settings">SettingsActivity</string>
     
-    <string name="pref_general_location_title">Location</string>
-    <string name="pref_general_location_key" translatable="false">location</string>
-    <string name="pref_general_location_default" translatable="false">1809858</string>
+    <string name="pref_location_title">Location</string>
+    <string name="pref_location_key" translatable="false">location</string>
+    <string name="pref_location_default" translatable="false">1809858</string>
 
-    <string name="pref_general_location_summary" translatable="false">summary</string>
+
+
+    <string name="pref_TemperatureUnits_title">Temperature Units</string>
+    <string name="pref_TemperatureUnits_key">units</string>
+    <string name="pref_TemperatureUnits_default">Metric</string>
+
+    <array name="pref_TemperatureUnits_entries">
+        <item>Metric</item>
+        <item>Imperial</item>
+    </array>
+    <array name="pref_TemperatureUnits_values">
+        <item>metric</item>
+        <item>imperial</item>
+    </array>
+    
 </resources>
