@@ -8,6 +8,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.text.format.Time;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,7 +19,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.text.format.Time;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -28,7 +30,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -41,6 +42,7 @@ import java.util.List;
  */
 public class ForecastFragment extends Fragment {
 
+    private  String LOG_TAG = this.getTag();
     public ForecastFragment() {
     }
 
@@ -58,8 +60,9 @@ public class ForecastFragment extends Fragment {
         SharedPreferences mSharedPreference = PreferenceManager.getDefaultSharedPreferences(getContext());
         String cityId = mSharedPreference.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
         String units = mSharedPreference.getString(getString(R.string.pref_TemperatureUnits_key), getString(R.string.pref_TemperatureUnits_default));
-        String[] input = {cityId,units};
+        String[] input = {cityId, units};
         refreshWeather.execute(input);
+        //String cityName = refreshWeather.doInBackground(input)[1];
     }
 
     @Override
@@ -82,12 +85,35 @@ public class ForecastFragment extends Fragment {
             return true;
         }
 
+        if (id == R.id.view_map) {
+            openPreferredLocationinMap();
+            return true;
+        }
+
+
         return super.onOptionsItemSelected(item);
     }
 
-
     private ArrayAdapter<String> mForecastAdapter;
+    private String cityNameNCountry;
 
+    private void openPreferredLocationinMap(){
+        ForecastFragment.FetchWeatherTask refreshWeather = new ForecastFragment.FetchWeatherTask();
+        SharedPreferences mSharedPreference = PreferenceManager.getDefaultSharedPreferences(getContext());
+        String location = cityNameNCountry;
+        Uri geoLocation = Uri.parse("geo:0,0?").buildUpon()
+                .appendQueryParameter("q", cityNameNCountry)
+                .build();
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(geoLocation);
+        if (intent.resolveActivity(getActivity().getPackageManager()) != null){
+            startActivity(intent);
+        }
+        else{
+            Log.d(LOG_TAG, "Couldn't call location " + location);
+        }
+    }
 
 
     @Override
@@ -127,6 +153,11 @@ public class ForecastFragment extends Fragment {
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(mForecastAdapter);
 
+        TextView textView = (TextView) rootView.findViewById(R.id.CityNameTextView);
+
+            textView.setText(cityNameNCountry);
+
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -147,6 +178,7 @@ public class ForecastFragment extends Fragment {
             }
         });
 
+        
 
         return rootView;
     }
@@ -191,7 +223,7 @@ public class ForecastFragment extends Fragment {
          * Fortunately parsing is easy:  constructor takes the JSON string and converts it
          * into an Object hierarchy for us.
          */
-        private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
+        public String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
                 throws JSONException {
 
             // These are the names of the JSON objects that need to be extracted.
@@ -201,6 +233,8 @@ public class ForecastFragment extends Fragment {
             final String OWM_MAX = "max";
             final String OWM_MIN = "min";
             final String OWM_DESCRIPTION = "main";
+
+
 
             JSONObject forecastJson = new JSONObject(forecastJsonStr);
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
@@ -251,7 +285,20 @@ public class ForecastFragment extends Fragment {
                 double low = temperatureObject.getDouble(OWM_MIN);
 
                 highAndLow = formatHighLows(high, low);
-                resultStrs[i] = day + " - " + description + " - " + highAndLow;
+
+
+                final String OWM_CITY = "city";
+                final String OWM_CITYNAME = "name";
+                final String OWM_CITYCOUNTRY = "country";
+
+                JSONObject city = forecastJson.getJSONObject(OWM_CITY);
+                String cityName = city.getString(OWM_CITYNAME);
+                String cityCountry = city.getString(OWM_CITYCOUNTRY);
+                cityNameNCountry = cityName + ", " + cityCountry;
+
+
+
+                resultStrs[i] = day + " - " + description + " : " + highAndLow + "  " +cityName +", "+ cityCountry;
             }
 
             /*for (String s : resultStrs) {
@@ -260,6 +307,19 @@ public class ForecastFragment extends Fragment {
 
             return resultStrs;
         }
+
+        /*private String getCityNameNCountryfromJSON(String forecastJsonStr)
+        throws JSONException{
+            final String OWM_CITY = "city";
+            final String OWM_CITYNAME = "name";
+            final String OWM_CITYCOUNTRY = "country";
+            JSONObject forecastJson = new JSONObject(forecastJsonStr);
+            JSONObject city = forecastJson.getJSONArray(OWM_CITY).getJSONObject(0);
+            String cityName = city.getString(OWM_CITYNAME);
+            String cityCountry = city.getString(OWM_CITYCOUNTRY);
+
+            return cityName + ", " + cityCountry;
+        }*/
 
 
 
@@ -271,6 +331,8 @@ public class ForecastFragment extends Fragment {
             BufferedReader reader = null;
 
             String forecastJsonStr = null;
+
+            //String[] result;
 
             int numDays = 7;
             String format = "json";
@@ -334,8 +396,15 @@ public class ForecastFragment extends Fragment {
                 }
             }
 
+            /*try{
+                cityNameNCountry = getCityNameNCountryfromJSON(forecastJsonStr);
+            }catch (JSONException e){
+
+            }*/
 
             try {
+                //String[][] result = {getWeatherDataFromJson(forecastJsonStr, numDays),getCityNameNCountryfromJSON(forecastJsonStr)};
+
                 return getWeatherDataFromJson(forecastJsonStr, numDays);
             } catch (JSONException e) {
                 //Log.e(LOG_TAG, e.getMessage(), e);
@@ -353,6 +422,7 @@ public class ForecastFragment extends Fragment {
                 for (String dayForecastStr : result){
                     mForecastAdapter.add(dayForecastStr);
                 }
+
             }
         }
     }

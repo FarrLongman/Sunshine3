@@ -10,8 +10,9 @@
         android:defaultValue="@string/pref_location_default"
         android:inputType="text"
         android:singleLine="true"
+        android:contentDescription="@string/pref_location_description">
 
-        >
+
 
     </EditTextPreference>
 
@@ -22,11 +23,9 @@
         android:entries="@array/pref_TemperatureUnits_entries"
         android:entryValues="@array/pref_TemperatureUnits_entries">
 
-
-
-
-
     </ListPreference>
+
+
 
 
 </PreferenceScreen>

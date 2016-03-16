@@ -36,11 +36,4 @@ public class DetailsActivityFragment extends Fragment {
     }
 
 
-
-
-
-
-
-
-
 }

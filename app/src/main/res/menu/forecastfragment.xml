@@ -8,4 +8,10 @@
         app:showAsAction="never"
 
         />
+    <item
+        android:id="@+id/view_map"
+        android:title="@string/view_map"
+        app:showAsAction="ifRoom">
+
+    </item>
 </menu>
